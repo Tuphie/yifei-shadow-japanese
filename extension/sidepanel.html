@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Kage 影读</title>
+<link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand"><span class="mark">影</span><span>Kage 影读</span></div>
+    <nav class="tabs">
+      <button data-tab="study" class="on">跟读</button>
+      <button data-tab="words">生词本 <span id="wordCount"></span></button>
+      <button data-tab="settings">设置</button>
+    </nav>
+  </header>
+
+  <!-- ===== 跟读 ===== -->
+  <section id="tab-study" class="tab on">
+    <div id="videoBar" class="video-bar">
+      <div id="videoTitle" class="video-title">正在连接 YouTube…</div>
+      <div id="videoMeta" class="video-meta"></div>
+    </div>
+
+    <div id="status" class="status hidden"></div>
+
+    <div id="controls" class="controls hidden">
+      <div class="row">
+        <button id="btnPrev" class="icon" title="上一句 ←">⏮</button>
+        <button id="btnPlay" class="icon big" title="播放 / 暂停 · 空格">▶</button>
+        <button id="btnNext" class="icon" title="下一句 →">⏭</button>
+        <span class="sep"></span>
+        <button id="btnAuto" class="chip" title="每句播完自动停顿，留时间跟读 · P">跟读停顿</button>
+        <button id="btnLoop" class="chip" title="单句循环 · L">单句循环</button>
+      </div>
+      <div class="row small">
+        <label>停顿 <select id="selGap">
+          <option value="0.8">0.8×</option><option value="1">1.0×</option><option value="1.2">1.2×</option>
+          <option value="1.5">1.5×</option><option value="2">2.0×</option></select></label>
+        <span class="speeds" id="speeds">
+          <button data-rate="0.6">0.6</button><button data-rate="0.75">0.75</button>
+          <button data-rate="0.85">0.85</button><button data-rate="1">1.0</button>
+        </span>
+      </div>
+      <div class="row small">
+        <button id="tgFuri" class="toggle">注音</button>
+        <button id="tgRoma" class="toggle">罗马音</button>
+        <button id="tgTrans" class="toggle">翻译</button>
+        <button id="tgFollow" class="toggle">跟随</button>
+        <span class="grow"></span>
+        <button id="btnAiTrans" class="link hidden">AI 翻译全部</button>
+      </div>
+      <div id="gapBar" class="gap-bar"><div></div></div>
+    </div>
+
+    <div id="list" class="list"></div>
+  </section>
+
+  <!-- ===== 生词本 ===== -->
+  <section id="tab-words" class="tab">
+    <div class="words-head">
+      <input id="wordSearch" type="search" placeholder="搜索单词、读音或释义">
+      <button id="btnExport" class="chip">导出 Anki CSV</button>
+    </div>
+    <div id="wordList" class="word-list"></div>
+  </section>
+
+  <!-- ===== 设置 ===== -->
+  <section id="tab-settings" class="tab">
+    <div class="form">
+      <h3>AI 拆解（可选）</h3>
+      <p class="hint">用于"一句一拆"、单词语境释义和整篇翻译。Key 只保存在本机浏览器里，直接从插件发往你选择的服务商。</p>
+      <label>服务商
+        <select id="setProvider">
+          <option value="anthropic">Anthropic (Claude)</option>
+          <option value="openai">OpenAI 兼容（DeepSeek / Kimi / 通义 等）</option>
+        </select>
+      </label>
+      <label class="for-openai">Base URL <input id="setBase" placeholder="https://api.deepseek.com/v1"></label>
+      <label>API Key <input id="setKey" type="password" placeholder="sk-..."></label>
+      <label>模型 <input id="setModel" placeholder="claude-haiku-4-5-20251001"></label>
+      <div class="row"><button id="btnSaveAi" class="primary">保存</button><button id="btnTestAi" class="chip">测试连接</button><span id="aiMsg" class="hint"></span></div>
+
+      <h3>学习偏好</h3>
+      <label>翻译显示
+        <select id="setTransMode">
+          <option value="show">直接显示</option>
+          <option value="blur">模糊，悬停查看（推荐）</option>
+          <option value="hide">隐藏</option>
+        </select>
+      </label>
+      <label>录音自动停止（秒，0 = 手动停止）<input id="setRecMax" type="number" min="0" max="30" step="1"></label>
+
+      <h3>字幕兜底</h3>
+      <p class="hint">如果视频抓不到日语字幕，可以导入 .srt / .vtt 字幕文件（时间轴需与视频一致）。</p>
+      <input id="fileSub" type="file" accept=".srt,.vtt,.txt">
+
+      <h3>快捷键（焦点在侧边栏时）</h3>
+      <p class="hint keys">空格 播放/暂停 · ← → 上/下一句 · R 重听本句 · M 录音/停止 · C 原声→我的对比 · P 跟读停顿 · L 单句循环 · Alt+K 打开侧边栏</p>
+    </div>
+  </section>
+
+  <!-- word sheet -->
+  <div id="sheet" class="sheet hidden">
+    <div class="sheet-card">
+      <button class="close" id="sheetClose">×</button>
+      <div id="sheetBody"></div>
+    </div>
+  </div>
+
+  <script src="lib/kuromoji.js"></script>
+  <script src="lib/wanakana.min.js"></script>
+  <script src="core.js"></script>
+  <script src="sidepanel.js"></script>
+</body>
+</html>
