@@ -10,10 +10,16 @@ extension/
   inject.js       运行在 YouTube 页面主环境：读取字幕轨；必要时借用播放器自己请求字幕时带的 pot 令牌
   content.js      跟读引擎（自动停顿 / 单句循环 / 单句播放），通过 chrome.runtime 与侧边栏通信
   sidepanel.*     侧边栏界面：句子卡片、查词、录音、AI 拆解、生词本、设置
-  core.js         纯函数：字幕解析、切句、翻译对齐、注音对齐、分词合并（Node 可直接测试）
+  core.js         纯函数：字幕解析、翻译对齐、注音对齐、分词合并
+  segment.js      断句引擎：词级时间轴 → 断点打分 → 动态规划；手动拆分 / 合并；AI 标点映射
+  jlpt.js         JLPT 等级查询与视频难度统计
+  data/jlpt.json  离线等级词表（CC BY-SA 4.0，见 data/NOTICE-jlpt.md）
   lib/ dict/      kuromoji.js 与 IPADIC 词典、WanaKana
   mic.html/js     首次麦克风授权页（侧边栏不能直接弹权限框）
-tests/            core.js 单元测试（node --test）
+tests/            单元测试（node --test）
+  fixtures/       断句评测用的字幕：*.gold.json 是正确断句；real/ 放用户反馈的真实样本
+  make-fixtures.js  生成合成测试字幕（模拟 YouTube json3 的人工字幕和自动字幕格式）
+  eval-seg.js     断句评测：npm run bench
 scripts/build.sh  打包 Release zip
 ```
 
@@ -31,7 +37,9 @@ scripts/build.sh  打包 Release zip
 - 不引入构建工具和框架，保持"加载文件夹即可运行"
 - 不加任何遥测或第三方统计
 - 新的外部请求需要在 `PRIVACY.md` 里说明
-- 切句、注音逻辑改动请在 `tests/core.test.js` 加用例
+- 改断句逻辑后跑 `npm run bench`，F1 不能低于 `tests/segment.test.js` 里的下限；提高了就把下限也调上去
+- 收到用户导出的 `kage-seg-*.json`：人工标注正确断句后放进 `tests/fixtures/real/`
+- 注音、分词逻辑改动请在 `tests/core.test.js` 加用例
 - 提交信息中英文均可，说清楚改了什么、为什么
 
 ## 发布

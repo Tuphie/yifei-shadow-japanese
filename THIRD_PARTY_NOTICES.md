@@ -7,6 +7,7 @@ Kage 影读 bundles the following open-source components inside `extension/`.
 | [kuromoji.js](https://github.com/takuyaa/kuromoji.js) | 0.1.2 | Apache License 2.0 | `extension/lib/kuromoji.js`, license in `extension/lib/LICENSE-kuromoji.txt` |
 | mecab-ipadic 2.7.0-20070801 (dictionary data shipped with kuromoji.js) | — | NAIST / ICOT terms | `extension/dict/`, full notice in `extension/dict/NOTICE-ipadic.md` |
 | [WanaKana](https://github.com/WaniKani/WanaKana) | 5.3.1 | MIT | `extension/lib/wanakana.min.js`, license in `extension/lib/LICENSE-wanakana.txt` |
+| JLPT level table derived from [OpenJLPT](https://pypi.org/project/openjlpt/) (Waller's lists, JMdict, KANJIDIC2) | 0.1.0 | **CC BY-SA 4.0** | `extension/data/jlpt.json`, notice in `extension/data/NOTICE-jlpt.md` |
 
 ## Modification to kuromoji.js
 

@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Kage 影读 · YouTube 日语影子跟读",
   "short_name": "Kage 影读",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "把任意 YouTube 日语视频变成影子跟读教材：逐句循环、自动停顿、录音对比、注音查词、生词本与 AI 语法拆解。",
   "minimum_chrome_version": "114",
   "permissions": [

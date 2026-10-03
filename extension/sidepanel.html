@@ -20,6 +20,7 @@
     <div id="videoBar" class="video-bar">
       <div id="videoTitle" class="video-title">正在连接 YouTube…</div>
       <div id="videoMeta" class="video-meta"></div>
+      <div id="diff" class="diff hidden"></div>
     </div>
 
     <div id="status" class="status hidden"></div>
@@ -47,8 +48,20 @@
         <button id="tgRoma" class="toggle">罗马音</button>
         <button id="tgTrans" class="toggle">翻译</button>
         <button id="tgFollow" class="toggle">跟随</button>
+        <button id="tgLevel" class="toggle" title="给超出你水平的词加下划线（在设置里选水平）">超纲词</button>
         <span class="grow"></span>
         <button id="btnAiTrans" class="link hidden">AI 翻译全部</button>
+        <button id="tgEdit" class="toggle" title="手动合并 / 拆分句子 · E">✂ 断句</button>
+      </div>
+      <div id="editBar" class="edit-bar hidden">
+        <div><b>编辑断句</b>：点句中的词，从它前面断开；点「⤒ 合并到上一句」把两句连起来。改动只保存在这个视频上。</div>
+        <div class="row">
+          <button id="btnAiSeg" class="chip">✨ AI 优化断句</button>
+          <button id="btnResetSeg" class="chip">恢复自动断句</button>
+          <button id="btnExportSeg" class="chip" title="导出原始字幕和当前断句，用于反馈问题">导出断句数据</button>
+          <span class="grow"></span>
+          <button id="btnEditDone" class="primary small">完成</button>
+        </div>
       </div>
       <div id="gapBar" class="gap-bar"><div></div></div>
     </div>
@@ -82,6 +95,17 @@
       <div class="row"><button id="btnSaveAi" class="primary">保存</button><button id="btnTestAi" class="chip">测试连接</button><span id="aiMsg" class="hint"></span></div>
 
       <h3>学习偏好</h3>
+      <label>我的日语水平（句子里会给更难的词加下划线）
+        <select id="setLevel">
+          <option value="0">不标注</option>
+          <option value="5">N5（刚入门）</option>
+          <option value="4">N4</option>
+          <option value="3">N3</option>
+          <option value="2">N2</option>
+          <option value="1">N1（标注级外以外的都不标）</option>
+        </select>
+      </label>
+      <p class="hint">等级来自社区整理的 JLPT 参考词表（官方 2010 年后不再公布词表），仅供参考。词表里没有的词按汉字等级估计，标「≈」。</p>
       <label>翻译显示
         <select id="setTransMode">
           <option value="show">直接显示</option>
@@ -96,7 +120,10 @@
       <input id="fileSub" type="file" accept=".srt,.vtt,.txt">
 
       <h3>快捷键（焦点在侧边栏时）</h3>
-      <p class="hint keys">空格 播放/暂停 · ← → 上/下一句 · R 重听本句 · M 录音/停止 · C 原声→我的对比 · P 跟读停顿 · L 单句循环 · Alt+K 打开侧边栏</p>
+      <p class="hint keys">空格 播放/暂停 · ← → 上/下一句 · R 重听本句 · M 录音/停止 · C 原声→我的对比 · P 跟读停顿 · L 单句循环 · E 编辑断句 · Alt+K 打开侧边栏</p>
+
+      <h3>反馈断句问题</h3>
+      <p class="hint">遇到断错的视频：点跟读页的「✂ 断句」→「导出断句数据」，把下载的文件附在 GitHub Issue 里。这些真实样本会用来改进断句。</p>
     </div>
   </section>
 
@@ -111,6 +138,8 @@
   <script src="lib/kuromoji.js"></script>
   <script src="lib/wanakana.min.js"></script>
   <script src="core.js"></script>
+  <script src="segment.js"></script>
+  <script src="jlpt.js"></script>
   <script src="sidepanel.js"></script>
 </body>
 </html>

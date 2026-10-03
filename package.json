@@ -1,12 +1,14 @@
 {
   "name": "kage-yingdu",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Kage 影读 — turn any YouTube video with Japanese captions into shadowing material.",
   "license": "MIT",
   "scripts": {
-    "test": "node --test tests/core.test.js",
-    "build": "bash scripts/build.sh"
+    "test": "node --test tests/core.test.js tests/segment.test.js",
+    "build": "bash scripts/build.sh",
+    "bench": "node tests/eval-seg.js",
+    "fixtures": "node tests/make-fixtures.js"
   },
   "devDependencies": {
     "kuromoji": "0.1.2",
