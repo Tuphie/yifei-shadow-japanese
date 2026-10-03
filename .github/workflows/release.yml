@@ -1,13 +1,29 @@
-# Push a tag like v0.2.0 → run tests, package extension/, publish a GitHub Release with the zip.
-# Release notes come from the matching "## v0.2.0" section in CHANGELOG.md.
+# Publish a GitHub Release whenever main carries a version that has not been released yet.
+#
+#   1. bump "version" in extension/manifest.json (and package.json)
+#   2. add a "## v<version>" section to CHANGELOG.md
+#   3. push to main
+#
+# The workflow runs the tests, packages extension/ into kage-v<version>.zip, creates the tag
+# v<version> on that commit and publishes the release with the CHANGELOG section as notes.
+# Pushes that don't change the version do nothing.
 name: Release
 
 on:
   push:
-    tags: ['v*']
+    branches: [main]
+    paths:
+      - 'extension/manifest.json'
+      - 'CHANGELOG.md'
+      - '.github/workflows/release.yml'
+  workflow_dispatch:
 
 permissions:
   contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
   release:
@@ -19,34 +35,48 @@ jobs:
         with:
           node-version: 20
 
-      - name: Check tag matches manifest version
+      - name: Read version
+        id: ver
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          TAG="${GITHUB_REF_NAME#v}"
-          MANIFEST=$(node -p "require('./extension/manifest.json').version")
-          if [ "$TAG" != "$MANIFEST" ]; then
-            echo "Tag $GITHUB_REF_NAME does not match manifest version $MANIFEST" >&2
-            exit 1
+          VERSION=$(node -p "require('./extension/manifest.json').version")
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
+            echo "v$VERSION is already released — nothing to do."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Releasing v$VERSION"
+            echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Test
+        if: steps.ver.outputs.skip == 'false'
         run: npm install --no-audit --no-fund && npm test
 
       - name: Package
+        if: steps.ver.outputs.skip == 'false'
         run: npm run build
 
       - name: Release notes
+        if: steps.ver.outputs.skip == 'false'
+        env:
+          TAG: ${{ steps.ver.outputs.tag }}
         run: |
-          awk -v ver="## ${GITHUB_REF_NAME}" '
-            $0 ~ "^## " { if (found) exit; if (index($0, ver) == 1) { found = 1; next } }
+          awk -v ver="## ${TAG}" '
+            /^## / { if (found) exit; if (index($0, ver) == 1) { found = 1; next } }
             found { print }
           ' CHANGELOG.md > notes.md
           if [ ! -s notes.md ]; then echo "See CHANGELOG.md" > notes.md; fi
           cat notes.md
 
       - name: Publish
+        if: steps.ver.outputs.skip == 'false'
         env:
           GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.ver.outputs.tag }}
         run: |
-          gh release create "$GITHUB_REF_NAME" "dist/kage-${GITHUB_REF_NAME}.zip" \
-            --title "Kage 影读 ${GITHUB_REF_NAME}" \
+          gh release create "$TAG" "dist/kage-${TAG}.zip" \
+            --target "$GITHUB_SHA" \
+            --title "Kage 影读 ${TAG}" \
             --notes-file notes.md

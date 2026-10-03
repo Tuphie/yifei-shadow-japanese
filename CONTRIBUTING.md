@@ -48,6 +48,6 @@ scripts/build.sh  打包 Release zip
 
 1. 修改 `extension/manifest.json` 和 `package.json` 的版本号
 2. 在 `CHANGELOG.md` 顶部加一节 `## v<版本>`，写这一版的更新内容
-3. 提交后打标签并推送：`git tag v<版本> && git push origin v<版本>`
+3. 推送到 main
 
-GitHub Actions 会检查标签和 manifest 版本一致、跑测试、打包 zip，然后用 CHANGELOG 里对应的一节作为说明发布 Release。
+GitHub Actions 发现这个版本还没有 Release，就会跑测试、打包 zip、在这个提交上打标签 `v<版本>`，并用 CHANGELOG 里对应的一节作为说明发布。版本号没变的推送不会触发发布。也可以在 Actions 页面手动运行。
