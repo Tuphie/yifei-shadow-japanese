@@ -1,0 +1,52 @@
+# Push a tag like v0.2.0 → run tests, package extension/, publish a GitHub Release with the zip.
+# Release notes come from the matching "## v0.2.0" section in CHANGELOG.md.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Check tag matches manifest version
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          MANIFEST=$(node -p "require('./extension/manifest.json').version")
+          if [ "$TAG" != "$MANIFEST" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match manifest version $MANIFEST" >&2
+            exit 1
+          fi
+
+      - name: Test
+        run: npm install --no-audit --no-fund && npm test
+
+      - name: Package
+        run: npm run build
+
+      - name: Release notes
+        run: |
+          awk -v ver="## ${GITHUB_REF_NAME}" '
+            $0 ~ "^## " { if (found) exit; if (index($0, ver) == 1) { found = 1; next } }
+            found { print }
+          ' CHANGELOG.md > notes.md
+          if [ ! -s notes.md ]; then echo "See CHANGELOG.md" > notes.md; fi
+          cat notes.md
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" "dist/kage-${GITHUB_REF_NAME}.zip" \
+            --title "Kage 影读 ${GITHUB_REF_NAME}" \
+            --notes-file notes.md
